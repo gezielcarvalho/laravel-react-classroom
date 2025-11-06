@@ -18,6 +18,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "test:ci": "CI=true react-scripts test --coverage --watchAll=false",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
