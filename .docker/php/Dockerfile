@@ -4,7 +4,7 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 
 RUN apt-get update 
 
-RUN apt-get install -y wget git nodejs libzip-dev zip  libmcrypt-dev libmagickwand-dev --no-install-recommends 
+RUN apt-get install -y wget git nodejs libzip-dev zip  libmcrypt-dev libmagickwand-dev vim --no-install-recommends 
 
 RUN pecl install imagick 
 
