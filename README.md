@@ -1,60 +1,39 @@
-# Laravel React CRUD Application
+# Laravel React Classroom (Future SaaS)
 
-A full-stack CRUD (Create, Read, Update, Delete) application built with Laravel (backend) and React (frontend), containerized with Docker.
+This project is the foundation for a future-ready Education SaaS platform. It currently provides a full-stack CRUD application using Laravel (API) and React (frontend), containerized with Docker. The long-term vision is to evolve into a scalable SaaS for schools, teachers, and students.
 
-## 🚀 Features
+## 🚀 Current Features
 
-- **Backend**: Laravel 8 REST API
-- **Frontend**: React 18 with React Router
+- **Backend**: Laravel 8 REST API (PHP 7.3+/8.0+)
+- **Frontend**: React 18 (TypeScript), React Router
 - **Database**: MySQL 5.7
 - **Admin Panel**: phpMyAdmin
-- **Student Management**: Complete CRUD operations for student records
-- **Containerized**: Docker setup for easy deployment
+- **Student Management**: CRUD for student records
+- **Containerized**: Docker Compose for local development
 
 ## 📋 Prerequisites
 
-Before running this application, make sure you have the following installed:
-
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Docker & Docker Compose](https://docs.docker.com/get-docker/)
 - [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) (version 14+ for frontend development)
-- [npm](https://www.npmjs.com/) (comes with Node.js)
+- [Node.js](https://nodejs.org/) (v14+)
+- [npm](https://www.npmjs.com/)
 
-**Frontend Dependencies:**
-
-- React 18.0.0
-- React Router DOM 6.3.0
-- Axios for API requests
-- Bootstrap for styling
-- SweetAlert for notifications
-
-## 🛠️ Installation & Setup
+## 🛠️ Getting Started
 
 ### 1. Clone the Repository
 
 ```bash
 git clone <repository-url>
-cd laravel-react
+cd laravel-react-classroom
 ```
 
 ### 2. Set up Environment Variables
 
 ```bash
-# Copy the example environment file
 cp api/.env.example api/.env
 ```
 
-**Important**: Update the database configuration in `api/.env`:
-
-```env
-DB_CONNECTION=mysql
-DB_HOST=db
-DB_PORT=3306
-DB_DATABASE=laravel_db01
-DB_USERNAME=root
-DB_PASSWORD=A_1234567
-```
+Edit `api/.env` for your database settings (see `docker-compose.yaml` for defaults).
 
 ### 3. Build and Start the Containers
 
@@ -62,48 +41,29 @@ DB_PASSWORD=A_1234567
 docker compose up -d --build
 ```
 
-This command will:
-
-- Build the PHP/Apache container with Laravel
-- Set up MySQL database
-- Start phpMyAdmin
-- Install all dependencies
-
 ### 4. Set up Laravel Application
 
 ```bash
-# Access the API container
 docker exec -it api bash
-
-# Generate application key
+composer install
 php artisan key:generate
-
-# Run database migrations
 php artisan migrate
-
-# Exit the container
 exit
 ```
 
 ### 5. Set up Frontend Application
 
 ```bash
-# Navigate to frontend directory
 cd front
-
-# Install dependencies
 npm install
-
-# Start the React development server (runs on port 3000)
 npm start
 ```
 
-**Frontend Setup Notes:**
+**Frontend Notes:**
 
-- The React app will automatically open in your browser at http://localhost:3000
-- The development server supports hot reloading (changes appear instantly)
-- Make sure the Laravel API is running before starting the frontend
-- The frontend is configured to connect to the API at http://localhost:8000
+- Runs at http://localhost:3000
+- Connects to API at http://localhost:8000
+- Hot reloading enabled
 
 **If you encounter issues:**
 
@@ -111,65 +71,34 @@ npm start
 - Clear npm cache: `npm cache clean --force`
 - Delete node_modules and reinstall: `rm -rf node_modules && npm install`
 
-## 🌐 Access the Application
+## 🌐 Access
 
-Once everything is running, you can access:
+- **Frontend**: http://localhost:3000
+- **API**: http://localhost:8000
+- **phpMyAdmin**: http://localhost:8088 (user: `root`, pass: see .env)
 
-- **React Frontend**: http://localhost:3000
-- **Laravel API**: http://localhost:8000
-- **phpMyAdmin**: http://localhost:8088
-  - Username: `root`
-  - Password: `A_1234567`
+## 📱 Features (MVP)
 
-## 📱 Application Features
-
-The application provides a complete student management system with:
-
-- **View Students**: Display all students in a table format
-- **Add Student**: Create new student records
-- **Edit Student**: Update existing student information
-- **Delete Student**: Remove student records
-
-### Student Fields:
-
-- ID (auto-generated)
-- Name
-- Course
-- Email
-- Phone
+- View, add, edit, delete students
+- Student fields: ID, Name, Course, Email, Phone
 
 ## 🏗️ Project Structure
 
 ```
-laravel-react/
-├── api/                    # Laravel backend
-│   ├── app/
-│   ├── database/
-│   ├── routes/
-│   └── ...
-├── front/                  # React frontend
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── Student.js
-│   │   │   ├── AddStudent.js
-│   │   │   └── EditStudent.js
-│   │   └── ...
-│   └── ...
-├── .docker/               # Docker configuration
-│   ├── php/
-│   └── mysql/
+laravel-react-classroom/
+├── api/      # Laravel backend
+├── front/    # React frontend (TypeScript)
+├── docs/     # Documentation & plans
 └── docker-compose.yaml
 ```
 
 ## 🐳 Docker Services
 
-The application runs on three Docker containers:
+- **api**: PHP 8.0 + Apache + Laravel
+- **db**: MySQL 5.7
+- **phpmyadmin**: DB admin interface
 
-1. **api**: PHP 8.0 with Apache, Laravel application
-2. **db**: MySQL 5.7 database
-3. **phpmyadmin**: Database administration interface
-
-## 📊 API Endpoints
+## 📊 API Endpoints (Student)
 
 | Method | Endpoint                   | Description        |
 | ------ | -------------------------- | ------------------ |
@@ -179,7 +108,7 @@ The application runs on three Docker containers:
 | PUT    | `/api/update-student/{id}` | Update student     |
 | DELETE | `/api/delete-student/{id}` | Delete student     |
 
-## 🔧 Development Commands
+## 🔧 Development
 
 ### Backend (Laravel)
 
@@ -303,6 +232,14 @@ docker compose up -d --build
 ## 📝 License
 
 This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+---
+
+## 📈 Roadmap
+
+See `docs/action-plan.md` for the long-term SaaS action plan and vision.
 
 ---
 
