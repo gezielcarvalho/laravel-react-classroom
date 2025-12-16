@@ -35,7 +35,7 @@ describe("StudentService", () => {
         phone: "123456789",
       };
       const mockResponse = {
-        status: 200,
+        status: 201,
         data: { message: "Student created" },
       };
       mockedAxios.post.mockResolvedValueOnce(mockResponse);

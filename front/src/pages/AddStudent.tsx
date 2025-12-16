@@ -32,7 +32,8 @@ class AddStudent extends Component<{}, StudentFormState> {
 
     try {
       const res = await StudentService.createStudent(this.state);
-      if (res.data.status === 200) {
+      if (res.status >= 200 && res.status < 300) {
+        // Accept 200 OK or 201 Created
         swal("Success!", res.data.message, "success");
 
         if (originControl) {
