@@ -67,7 +67,21 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::logout();
+        // If this request is using token-based auth, try to delete the current access token
+        if ($request->user() && method_exists($request->user(), 'currentAccessToken')) {
+            $token = $request->user()->currentAccessToken();
+            // transient tokens (used by Sanctum for certain flows) do not implement delete()
+            if ($token && method_exists($token, 'delete')) {
+                $token->delete();
+            }
+        }
+
+        // Prefer logging out of the session-based 'web' guard when available
+        $webGuard = Auth::guard('web');
+        if (method_exists($webGuard, 'logout')) {
+            $webGuard->logout();
+        }
+
         if ($request->hasSession()) {
             $request->session()->invalidate();
             $request->session()->regenerateToken();

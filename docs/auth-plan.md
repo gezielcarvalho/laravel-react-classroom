@@ -51,6 +51,8 @@ Phases & Tasks (detailed)
 - Apply `auth:sanctum` middleware to routes that require authentication (e.g., student creation/edit if desired).
 - Add PHPUnit feature tests for login success/failure, protected route access, logout.
 
+- Note: the `logout` endpoint should handle both cookie-based (session/web guard) and token-based (personal access tokens) authentication flows. On logout the server should invalidate the session (if present) and remove any current access token when applicable.
+
 5. Frontend: Auth plumbing
 
 - Create `src/services/authService.ts` with methods:

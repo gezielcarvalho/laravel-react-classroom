@@ -7,11 +7,15 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Toolbar from "./components/Toolbar";
 
 const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
+        {/* Top toolbar with login/logout */}
+        <Toolbar />
+
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
