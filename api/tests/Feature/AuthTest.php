@@ -18,9 +18,12 @@ class AuthTest extends TestCase
         ]);
 
         // Perform CSRF cookie handshake required for Sanctum cookie-based auth
-        $this->get('/sanctum/csrf-cookie');
+        $resp = $this->get('/sanctum/csrf-cookie');
+        // Extract XSRF token from Set-Cookie header and send it as X-XSRF-TOKEN header
+        $csrfCookie = collect($resp->headers->getCookies())->firstWhere('getName', 'XSRF-TOKEN');
+        $xsrf = $csrfCookie ? urldecode($csrfCookie->getValue()) : null;
 
-        $response = $this->postJson('/api/login', [
+        $response = $this->withHeader('X-XSRF-TOKEN', $xsrf)->postJson('/api/login', [
             'email' => 'test@example.com',
             'password' => 'password',
         ]);
@@ -45,9 +48,11 @@ class AuthTest extends TestCase
         ];
 
         // Perform CSRF cookie handshake before register (sanctum cookie flow)
-        $this->get('/sanctum/csrf-cookie');
+        $resp = $this->get('/sanctum/csrf-cookie');
+        $csrfCookie = collect($resp->headers->getCookies())->firstWhere('getName', 'XSRF-TOKEN');
+        $xsrf = $csrfCookie ? urldecode($csrfCookie->getValue()) : null;
 
-        $response = $this->postJson('/api/register', $payload);
+        $response = $this->withHeader('X-XSRF-TOKEN', $xsrf)->postJson('/api/register', $payload);
 
         $response->assertStatus(201);
         $this->assertDatabaseHas('users', ['email' => 'new@example.com']);
@@ -57,7 +62,9 @@ class AuthTest extends TestCase
     public function test_register_then_login_flow()
     {
         // Handshake for cookie-based CSRF
-        $this->get('/sanctum/csrf-cookie');
+        $resp = $this->get('/sanctum/csrf-cookie');
+        $csrfCookie = collect($resp->headers->getCookies())->firstWhere('getName', 'XSRF-TOKEN');
+        $xsrf = $csrfCookie ? urldecode($csrfCookie->getValue()) : null;
 
         $payload = [
             'name' => 'Flow User',
@@ -66,12 +73,15 @@ class AuthTest extends TestCase
             'password_confirmation' => 'flowpassword',
         ];
 
-        $registerResp = $this->postJson('/api/register', $payload);
+        $registerResp = $this->withHeader('X-XSRF-TOKEN', $xsrf)->postJson('/api/register', $payload);
         $registerResp->assertStatus(201);
 
-        // After registration, ensure CSRF cookie still valid and attempt login
-        $this->get('/sanctum/csrf-cookie');
-        $loginResp = $this->postJson('/api/login', [
+        // After registration, re-handshake and attempt login
+        $resp2 = $this->get('/sanctum/csrf-cookie');
+        $csrfCookie2 = collect($resp2->headers->getCookies())->firstWhere('getName', 'XSRF-TOKEN');
+        $xsrf2 = $csrfCookie2 ? urldecode($csrfCookie2->getValue()) : null;
+
+        $loginResp = $this->withHeader('X-XSRF-TOKEN', $xsrf2)->postJson('/api/login', [
             'email' => 'flow@example.com',
             'password' => 'flowpassword',
         ]);
@@ -87,9 +97,11 @@ class AuthTest extends TestCase
         $this->actingAs($user, 'sanctum');
 
         // Ensure CSRF cookie/token present for logout call
-        $this->get('/sanctum/csrf-cookie');
+        $resp = $this->get('/sanctum/csrf-cookie');
+        $csrfCookie = collect($resp->headers->getCookies())->firstWhere('getName', 'XSRF-TOKEN');
+        $xsrf = $csrfCookie ? urldecode($csrfCookie->getValue()) : null;
 
-        $response = $this->postJson('/api/logout');
+        $response = $this->withHeader('X-XSRF-TOKEN', $xsrf)->postJson('/api/logout');
         $response->assertStatus(200);
 
         // After logout, requests should be unauthorized
