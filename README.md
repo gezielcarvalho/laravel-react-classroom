@@ -77,6 +77,16 @@ npm start
 - **API**: http://localhost:8000
 - **phpMyAdmin**: http://localhost:8088 (user: `root`, pass: see .env)
 
+## 📚 API Documentation (Swagger)
+
+If L5-Swagger is installed and configured, the interactive API docs will be available at:
+
+```
+http://localhost:8000/api/documentation
+```
+
+See `docs/swagger-installation.md` for installation and configuration steps.
+
 ## 📱 Features (MVP)
 
 - View, add, edit, delete students
