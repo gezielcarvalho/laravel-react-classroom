@@ -6,6 +6,32 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+/**
+ * @OA\Tag(
+ *     name="Students",
+ *     description="Operations about students"
+ * )
+ *
+ * @OA\Schema(
+ *     schema="Student",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="John Doe"),
+ *     @OA\Property(property="course", type="string", example="Computer Science"),
+ *     @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+ *     @OA\Property(property="phone", type="string", example="123456789")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="StudentCreate",
+ *     type="object",
+ *     required={"name"},
+ *     @OA\Property(property="name", type="string", example="John Doe"),
+ *     @OA\Property(property="course", type="string", example="Computer Science"),
+ *     @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+ *     @OA\Property(property="phone", type="string", example="123456789")
+ * )
+ */
 class StudentController extends Controller
 {
     /**
@@ -13,11 +39,25 @@ class StudentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    /**
+     * @OA\Get(
+     *     path="/api/students",
+     *     tags={"Students"},
+     *     summary="Get list of students",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="students", type="array", @OA\Items(ref="#/components/schemas/Student"))
+     *         )
+     *     )
+     * )
+     */
     public function index()
     {
         return response()->json([
-            'status'=>200,
-            'students'=> Student::all()
+            'status' => 200,
+            'students' => Student::all()
         ]);
     }
 
@@ -39,17 +79,20 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $student = new Student;
-        $student->name = $request->input('name');
-        $student->course = $request->input('course');
-        $student->email = $request->input('email');
-        $student->phone = $request->input('phone');
-        $student->save();
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'course' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:50',
+        ]);
+
+        $student = Student::create($data);
 
         return response()->json([
-            'status'=>200,
-            'message'=>'Student added successfully'
-        ]);
+            'status' => 201,
+            'message' => 'Student added successfully',
+            'student' => $student
+        ], 201);
     }
 
     /**
@@ -57,6 +100,16 @@ class StudentController extends Controller
      *
      * @param  \App\Models\Student  $student
      * @return \Illuminate\Http\Response
+     */
+    /**
+     * @OA\Get(
+     *     path="/api/students/{id}",
+     *     tags={"Students"},
+     *     summary="Get a single student",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Successful operation", @OA\JsonContent(ref="#/components/schemas/Student")),
+     *     @OA\Response(response=404, description="Not Found")
+     * )
      */
     public function show(Student $student)
     {
@@ -81,6 +134,17 @@ class StudentController extends Controller
      * @param  \App\Models\Student  $student
      * @return \Illuminate\Http\Response
      */
+    /**
+     * @OA\Put(
+     *     path="/api/students/{id}",
+     *     tags={"Students"},
+     *     summary="Update a student",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(@OA\JsonContent(ref="#/components/schemas/StudentCreate")),
+     *     @OA\Response(response=200, description="Student updated", @OA\JsonContent(ref="#/components/schemas/Student")),
+     *     @OA\Response(response=404, description="Not Found")
+     * )
+     */
     public function update(Request $request, Student $student)
     {
         $data = $request->validate([
@@ -104,6 +168,16 @@ class StudentController extends Controller
      *
      * @param  \App\Models\Student  $student
      * @return \Illuminate\Http\Response
+     */
+    /**
+     * @OA\Delete(
+     *     path="/api/students/{id}",
+     *     tags={"Students"},
+     *     summary="Delete a student",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Student deleted"),
+     *     @OA\Response(response=404, description="Not Found")
+     * )
      */
     public function destroy(Student $student)
     {

@@ -50,6 +50,71 @@ docker compose exec api php artisan vendor:publish --provider "L5Swagger\L5Swagg
 
 This creates `config/l5-swagger.php` and the swagger assets.
 
+> Important: L5-Swagger requires a top-level `@OA\Info()` annotation (title & version). Add an annotations file (e.g. `app/Swagger/SwaggerAnnotations.php`) with an `@OA\Info` and `@OA\Server` so the generator can find the API metadata before running `php artisan l5-swagger:generate`. Example file content is included in the repo at `api/app/Swagger/SwaggerAnnotations.php`.
+>
+> ### Why we add a small placeholder class
+>
+> The OpenAPI generator (swagger-php) scans PHP files for `@OA` annotations. In some setups the scanner will miss top-level annotations that are placed in files without a class/namespace, or that are outside the configured scan paths. To reliably provide the required metadata (`@OA\Info`) we include a tiny namespaced placeholder class `App\Swagger\SwaggerAnnotations` whose class-level docblock contains `@OA\Info` and `@OA\Server` annotations. This ensures the generator always finds the API title & version before generating the spec.
+>
+> Example (already present at `api/app/Swagger/SwaggerAnnotations.php`):
+>
+> ```php
+> <?php
+> namespace App\Swagger;
+>
+> /**
+>  * @OA\Info(title="Laravel React Classroom API", version="1.0.0")
+>  * @OA\Server(url="http://localhost:8000", description="Local development server")
+>  */
+> class SwaggerAnnotations {}
+> ```
+>
+> **Tips / Troubleshooting**
+>
+> - Ensure `config/l5-swagger.php` includes the `app/Swagger` folder in `paths.annotations` (we add `base_path('app/Swagger')` to scan it first).
+> - Run the generator with verbosity to see which files are scanned:
+>   ```bash
+>   php artisan l5-swagger:generate -v
+>   ```
+> - If the `@OA\Info()` annotation is still not found:
+>   - Confirm the file is readable and in the project (no typos in namespace/path).
+>   - Run `composer dump-autoload` to refresh classmap/autoloading.
+>   - Clear Laravel caches: `php artisan config:clear && php artisan cache:clear`.
+>   - Check `config/l5-swagger.php` `scanOptions.pattern` if you use non-standard file patterns.
+> - Once the generator finds the `@OA\Info` annotation the command should succeed and generate `storage/api-docs/api-docs.json`.
+
+### Storage directory & file permissions (common cause of 500)
+
+If Swagger UI shows "Failed to load API definition" with a 500 / "Internal Server Error" when trying to fetch the generated JSON (for example `/docs?api-docs.json`), a common cause is that `storage/api-docs/api-docs.json` either does not exist or is not readable by the web process (ownership/permissions issue).
+
+Quick fixes (run inside the `api` container or via WSL):
+
+```bash
+# create the folder (if missing) and fix ownership/permissions for the web user
+mkdir -p storage/api-docs
+chown -R www-data:www-data storage storage/api-docs
+chmod -R 775 storage storage/api-docs
+
+# regenerate docs (verbose)
+php artisan l5-swagger:generate -v
+```
+
+If you use Docker from the host, run this one-liner:
+
+```bash
+docker compose exec api bash -lc "mkdir -p storage/api-docs && chown -R www-data:www-data storage storage/api-docs && chmod -R 775 storage storage/api-docs && php artisan l5-swagger:generate -v"
+```
+
+After fixing permissions, verify the generated file exists and is readable:
+
+```bash
+ls -la storage/api-docs
+head -n 20 storage/api-docs/api-docs.json
+tail -n 200 storage/logs/laravel.log
+```
+
+If permissions were the issue you should see `storage/api-docs/api-docs.json` present and readable by the web user and the Swagger UI will load the API definition successfully.
+
 ---
 
 ## 3) Configure L5-Swagger (recommended dev settings)
@@ -64,7 +129,7 @@ You can also add the following to `.env` for convenience:
 
 ```
 L5_SWAGGER_GENERATE_ALWAYS=true
-L5_SWAGGER_OPEN_API_SPEC_VERSION=3.0
+L5_SWAGGER_OPEN_API_SPEC_VERSION=3.0.0
 L5_SWAGGER_CONST_HOST=http://localhost:8000
 ```
 
