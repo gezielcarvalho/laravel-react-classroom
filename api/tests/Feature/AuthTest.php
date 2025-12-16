@@ -32,6 +32,22 @@ class AuthTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_register_creates_user_and_returns_201()
+    {
+        $payload = [
+            'name' => 'New User',
+            'email' => 'new@example.com',
+            'password' => 'securepassword',
+            'password_confirmation' => 'securepassword',
+        ];
+
+        $response = $this->postJson('/api/register', $payload);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', ['email' => 'new@example.com']);
+        $response->assertJsonStructure(['status', 'message', 'user' => ['id', 'email', 'name']]);
+    }
+
     public function test_logout_clears_session()
     {
         $user = User::factory()->create();

@@ -16,6 +16,17 @@ export default class AuthService {
     return apiClient.post("/api/login", credentials);
   }
 
+  static async register(payload: {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+  }): Promise<any> {
+    // Ensure CSRF cookie is set before attempting register
+    await this.getCsrf();
+    return apiClient.post("/api/register", payload);
+  }
+
   static async logout(): Promise<any> {
     return apiClient.post("/api/logout");
   }

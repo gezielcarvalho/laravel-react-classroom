@@ -9,6 +9,12 @@ interface AuthContextValue {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    password_confirmation: string
+  ) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -42,6 +48,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    password_confirmation: string
+  ) => {
+    // Call register endpoint then attempt to login to create session
+    const res = await AuthService.register({
+      name,
+      email,
+      password,
+      password_confirmation,
+    });
+    if (res.status >= 200 && res.status < 300) {
+      // After successful registration, log the user in
+      await login(email, password);
+    }
+  };
+
   const logout = async () => {
     await AuthService.logout();
     setUser(null);
@@ -49,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,6 +4,7 @@ import Student from "./pages/Student";
 import AddStudent from "./pages/AddStudent";
 import EditStudent from "./pages/EditStudent";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -13,6 +14,7 @@ const App: React.FC = () => {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route
             path="/"
             element={
