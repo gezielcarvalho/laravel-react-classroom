@@ -1,29 +1,27 @@
-import axios from "axios";
+import apiClient from "./apiClient";
 import { CreateStudentRequest, UpdateStudentRequest } from "../types/api";
-
-const API_BASE_URL = "http://localhost:8000/api";
 
 export class StudentService {
   static async getStudents(): Promise<any> {
-    return axios.get(`${API_BASE_URL}/students`);
+    return apiClient.get("/api/students");
   }
 
   static async getStudent(id: number): Promise<any> {
-    return axios.get(`${API_BASE_URL}/students/${id}`);
+    return apiClient.get(`/api/students/${id}`);
   }
 
   static async createStudent(student: CreateStudentRequest): Promise<any> {
-    return axios.post(`${API_BASE_URL}/students`, student);
+    return apiClient.post("/api/students", student);
   }
 
   static async updateStudent(
     id: number,
     student: UpdateStudentRequest
   ): Promise<any> {
-    return axios.put(`${API_BASE_URL}/students/${id}`, student);
+    return apiClient.put(`/api/students/${id}`, student);
   }
 
   static async deleteStudent(id: number): Promise<any> {
-    return axios.delete(`${API_BASE_URL}/students/${id}`);
+    return apiClient.delete(`/api/students/${id}`);
   }
 }

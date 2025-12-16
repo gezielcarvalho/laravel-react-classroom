@@ -1,0 +1,26 @@
+import apiClient from "./apiClient";
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export default class AuthService {
+  static async getCsrf(): Promise<any> {
+    return apiClient.get("/sanctum/csrf-cookie");
+  }
+
+  static async login(credentials: LoginCredentials): Promise<any> {
+    // Ensure CSRF cookie is set before attempting login
+    await this.getCsrf();
+    return apiClient.post("/api/login", credentials);
+  }
+
+  static async logout(): Promise<any> {
+    return apiClient.post("/api/logout");
+  }
+
+  static async getUser(): Promise<any> {
+    return apiClient.get("/api/user");
+  }
+}

@@ -1,8 +1,15 @@
 import axios from "axios";
 import { StudentService } from "../studentService";
 
-jest.mock("axios");
-const mockedAxios = axios as any;
+jest.mock("../apiClient", () => ({
+  get: jest.fn(),
+  post: jest.fn(),
+  put: jest.fn(),
+  delete: jest.fn(),
+}));
+
+import apiClient from "../apiClient";
+const mockedApiClient = apiClient as any;
 
 describe("StudentService", () => {
   afterEach(() => {
@@ -15,13 +22,11 @@ describe("StudentService", () => {
         status: 200,
         data: { students: [] },
       };
-      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+      mockedApiClient.get.mockResolvedValueOnce(mockResponse);
 
       const result = await StudentService.getStudents();
 
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        "http://localhost:8000/api/students"
-      );
+      expect(mockedApiClient.get).toHaveBeenCalledWith("/api/students");
       expect(result).toEqual(mockResponse);
     });
   });
@@ -38,12 +43,12 @@ describe("StudentService", () => {
         status: 201,
         data: { message: "Student created" },
       };
-      mockedAxios.post.mockResolvedValueOnce(mockResponse);
+      mockedApiClient.post.mockResolvedValueOnce(mockResponse);
 
       const result = await StudentService.createStudent(mockStudent);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        "http://localhost:8000/api/students",
+      expect(mockedApiClient.post).toHaveBeenCalledWith(
+        "/api/students",
         mockStudent
       );
       expect(result).toEqual(mockResponse);
@@ -63,12 +68,12 @@ describe("StudentService", () => {
         status: 200,
         data: { message: "Student updated" },
       };
-      mockedAxios.put.mockResolvedValueOnce(mockResponse);
+      mockedApiClient.put.mockResolvedValueOnce(mockResponse);
 
       const result = await StudentService.updateStudent(1, mockStudent);
 
-      expect(mockedAxios.put).toHaveBeenCalledWith(
-        "http://localhost:8000/api/students/1",
+      expect(mockedApiClient.put).toHaveBeenCalledWith(
+        "/api/students/1",
         mockStudent
       );
       expect(result).toEqual(mockResponse);
@@ -81,13 +86,11 @@ describe("StudentService", () => {
         status: 200,
         data: { message: "Student deleted" },
       };
-      mockedAxios.delete.mockResolvedValueOnce(mockResponse);
+      mockedApiClient.delete.mockResolvedValueOnce(mockResponse);
 
       const result = await StudentService.deleteStudent(1);
 
-      expect(mockedAxios.delete).toHaveBeenCalledWith(
-        "http://localhost:8000/api/students/1"
-      );
+      expect(mockedApiClient.delete).toHaveBeenCalledWith("/api/students/1");
       expect(result).toEqual(mockResponse);
     });
   });
