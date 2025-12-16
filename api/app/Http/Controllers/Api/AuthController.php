@@ -26,8 +26,10 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // Regenerate session to prevent fixation
-        $request->session()->regenerate();
+        // Regenerate session to prevent fixation if session is available
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         return response()->json([
             'status' => 200,
@@ -66,8 +68,10 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return response()->json(['status' => 200, 'message' => 'Logged out']);
     }

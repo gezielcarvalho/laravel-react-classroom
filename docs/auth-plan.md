@@ -5,7 +5,7 @@ Goal: Add user authentication (login/logout/current user) to the app using Larav
 Summary (high level)
 
 - Backend: enable and configure Laravel Sanctum, implement `AuthController` with `login`, `logout`, and `user` methods; protect API routes with `auth:sanctum` middleware; add validation and tests.
-- Frontend: add `AuthService` to perform CSRF fetch and login/logout, create `Login` page, `AuthProvider` (context) to hold authenticated user state, and `ProtectedRoute` component to guard pages.
+- Frontend: add `AuthService` to perform CSRF fetch and login/logout/register, create `Login` and `Signup` pages, `AuthProvider` (context) to hold authenticated user state, and `ProtectedRoute` component to guard pages.
 - Add tests: PHPUnit feature tests, frontend unit tests, and optionally an e2e test (Cypress/Playwright) for sign in flow.
 - Update docs: `README.md` and `docs/auth-plan.md` with usage steps and troubleshooting tips (CORS, cookies, CSRF).
 
@@ -38,9 +38,13 @@ Phases & Tasks (detailed)
   - `logout(Request $r)`: revoke tokens or `auth()->logout();` and clear session; return 200.
   - `user(Request $r)`: returns `auth()->user()`.
 - Register routes in `routes/api.php`:
+
   - `Route::post('login', [AuthController::class, 'login']);`
+  - `Route::post('register', [AuthController::class, 'register']);`
   - `Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');`
   - `Route::get('user', [AuthController::class, 'user'])->middleware('auth:sanctum');`
+
+  Note: when using Laravel Sanctum's cookie/session SPA flow, ensure your `login` and `register` endpoints have the session middleware available (for example, wrap them with `Route::middleware('web')->group(...)` in `routes/api.php`) so calls to `$request->session()` work correctly.
 
 4. Backend: Protect APIs & tests
 

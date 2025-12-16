@@ -17,6 +17,9 @@ class AuthTest extends TestCase
             // factory sets password to 'password' by default hash
         ]);
 
+        // Perform CSRF cookie handshake required for Sanctum cookie-based auth
+        $this->get('/sanctum/csrf-cookie');
+
         $response = $this->postJson('/api/login', [
             'email' => 'test@example.com',
             'password' => 'password',
@@ -41,6 +44,9 @@ class AuthTest extends TestCase
             'password_confirmation' => 'securepassword',
         ];
 
+        // Perform CSRF cookie handshake before register (sanctum cookie flow)
+        $this->get('/sanctum/csrf-cookie');
+
         $response = $this->postJson('/api/register', $payload);
 
         $response->assertStatus(201);
@@ -48,11 +54,40 @@ class AuthTest extends TestCase
         $response->assertJsonStructure(['status', 'message', 'user' => ['id', 'email', 'name']]);
     }
 
+    public function test_register_then_login_flow()
+    {
+        // Handshake for cookie-based CSRF
+        $this->get('/sanctum/csrf-cookie');
+
+        $payload = [
+            'name' => 'Flow User',
+            'email' => 'flow@example.com',
+            'password' => 'flowpassword',
+            'password_confirmation' => 'flowpassword',
+        ];
+
+        $registerResp = $this->postJson('/api/register', $payload);
+        $registerResp->assertStatus(201);
+
+        // After registration, ensure CSRF cookie still valid and attempt login
+        $this->get('/sanctum/csrf-cookie');
+        $loginResp = $this->postJson('/api/login', [
+            'email' => 'flow@example.com',
+            'password' => 'flowpassword',
+        ]);
+
+        $loginResp->assertStatus(200);
+        $loginResp->assertJsonStructure(['status', 'message', 'user' => ['id', 'email', 'name']]);
+    }
+
     public function test_logout_clears_session()
     {
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum');
+
+        // Ensure CSRF cookie/token present for logout call
+        $this->get('/sanctum/csrf-cookie');
 
         $response = $this->postJson('/api/logout');
         $response->assertStatus(200);
