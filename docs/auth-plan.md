@@ -77,7 +77,19 @@ Phases & Tasks (detailed)
 - Ensure `api` CORS config allows credentials and the frontend origin in `config/cors.php`:
   - `'supports_credentials' => true` and allowed origins include `http://localhost:3000`.
   - Add `FRONTEND_URL` to `.env` during local setup if needed.
-- Ensure cookies have correct `SameSite` and `secure` flags for the environment.
+- Ensure `config/sanctum.php` `stateful` contains your frontend host (e.g., `localhost:3000`) and enable `\Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful` in the `api` middleware group in `app/Http/Kernel.php` (this makes Sanctum treat the SPA origin as first-party and allow stateful cookie auth).
+- Session cookie settings (important for cross-port/local dev):
+
+  - If your SPA runs on a different origin (eg. `http://localhost:3000`), browsers treat requests as cross-site and the session cookie may not be included if `session.same_site` is `lax`.
+  - For local development, add to your `.env`:
+
+    ```env
+    SESSION_SECURE_COOKIE=false
+    SESSION_SAME_SITE=none
+    # Optionally: SESSION_DOMAIN=.localhost
+    ```
+
+  - Note: Some browsers require `SameSite=None` cookies to be `Secure`. If cookies are blocked, prefer running frontend and API under the same origin (or use a dev proxy) to avoid cross-site cookie restrictions.
 
 9. Docs & developer notes
 

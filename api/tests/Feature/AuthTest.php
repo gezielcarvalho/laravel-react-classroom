@@ -38,6 +38,13 @@ class AuthTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_csrf_cookie_sets_xsrf_token()
+    {
+        $resp = $this->get('/sanctum/csrf-cookie');
+        $cookies = collect($resp->headers->getCookies());
+        $this->assertTrue($cookies->contains(fn($c) => $c->getName() === 'XSRF-TOKEN'));
+    }
+
     public function test_register_creates_user_and_returns_201()
     {
         $payload = [
