@@ -9,21 +9,21 @@ export class StudentService {
   }
 
   static async getStudent(id: number): Promise<any> {
-    return axios.get(`${API_BASE_URL}/edit-student/${id}`);
+    return axios.get(`${API_BASE_URL}/students/${id}`);
   }
 
   static async createStudent(student: CreateStudentRequest): Promise<any> {
-    return axios.post(`${API_BASE_URL}/add-student`, student);
+    return axios.post(`${API_BASE_URL}/students`, student);
   }
 
   static async updateStudent(
     id: number,
     student: UpdateStudentRequest
   ): Promise<any> {
-    return axios.put(`${API_BASE_URL}/update-student/${id}`, student);
+    return axios.put(`${API_BASE_URL}/students/${id}`, student);
   }
 
   static async deleteStudent(id: number): Promise<any> {
-    return axios.delete(`${API_BASE_URL}/delete-student/${id}`);
+    return axios.delete(`${API_BASE_URL}/students/${id}`);
   }
 }

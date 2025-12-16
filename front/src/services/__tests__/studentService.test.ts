@@ -43,7 +43,7 @@ describe("StudentService", () => {
       const result = await StudentService.createStudent(mockStudent);
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
-        "http://localhost:8000/api/add-student",
+        "http://localhost:8000/api/students",
         mockStudent
       );
       expect(result).toEqual(mockResponse);
@@ -68,7 +68,7 @@ describe("StudentService", () => {
       const result = await StudentService.updateStudent(1, mockStudent);
 
       expect(mockedAxios.put).toHaveBeenCalledWith(
-        "http://localhost:8000/api/update-student/1",
+        "http://localhost:8000/api/students/1",
         mockStudent
       );
       expect(result).toEqual(mockResponse);
@@ -86,7 +86,7 @@ describe("StudentService", () => {
       const result = await StudentService.deleteStudent(1);
 
       expect(mockedAxios.delete).toHaveBeenCalledWith(
-        "http://localhost:8000/api/delete-student/1"
+        "http://localhost:8000/api/students/1"
       );
       expect(result).toEqual(mockResponse);
     });

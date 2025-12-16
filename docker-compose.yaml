@@ -1,16 +1,13 @@
-version: '3.1'
-
 services:
-
   api:
     build: .docker/php
     container_name: api
-    ports: 
+    ports:
       - "8000:80"
-    volumes: 
+    volumes:
       - ./api:/var/www/html
     networks:
-      - app   
+      - app
 
   db:
     build: .docker/mysql
@@ -18,13 +15,13 @@ services:
     restart: always
     volumes:
       - "./.docker/dbdata:/var/lib/mysql"
-    environment: 
+    environment:
       MYSQL_ROOT_PASSWORD: A_1234567
       MYSQL_DATABASE: laravel_db01
     networks:
       - app
 
-  phpmyadmin: 
+  phpmyadmin:
     image: phpmyadmin
     container_name: myadmin
     restart: always

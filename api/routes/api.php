@@ -15,11 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/add-student',[StudentController::class, 'store']);
-Route::get('/students',[StudentController::class, 'index']);
-Route::get('/edit-student/{id}',[StudentController::class, 'edit']);
-Route::put('/update-student/{id}',[StudentController::class, 'update']);
-Route::delete('/delete-student/{id}',[StudentController::class, 'destroy']);
+// Use RESTful resource routes for students
+Route::apiResource('students', StudentController::class);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

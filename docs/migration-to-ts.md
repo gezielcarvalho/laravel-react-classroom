@@ -279,24 +279,24 @@ export class StudentService {
   }
 
   static async getStudent(id: number): Promise<AxiosResponse<StudentResponse>> {
-    return axios.get(`${API_BASE_URL}/edit-student/${id}`);
+    return axios.get(`${API_BASE_URL}/students/${id}`);
   }
 
   static async createStudent(
     student: CreateStudentRequest
   ): Promise<AxiosResponse<ApiResponse>> {
-    return axios.post(`${API_BASE_URL}/add-student`, student);
+    return axios.post(`${API_BASE_URL}/students`, student);
   }
 
   static async updateStudent(
     id: number,
     student: UpdateStudentRequest
   ): Promise<AxiosResponse<ApiResponse>> {
-    return axios.put(`${API_BASE_URL}/update-student/${id}`, student);
+    return axios.put(`${API_BASE_URL}/students/${id}`, student);
   }
 
   static async deleteStudent(id: number): Promise<AxiosResponse<ApiResponse>> {
-    return axios.delete(`${API_BASE_URL}/delete-student/${id}`);
+    return axios.delete(`${API_BASE_URL}/students/${id}`);
   }
 }
 ```
@@ -463,7 +463,7 @@ describe("Student Component", () => {
     await user.click(deleteButtons[0]);
 
     expect(mockedAxios.delete).toHaveBeenCalledWith(
-      "http://localhost:8000/api/delete-student/1"
+      "http://localhost:8000/api/students/1"
     );
   });
 });
@@ -519,7 +519,7 @@ describe("StudentService", () => {
       const result = await StudentService.createStudent(mockStudent);
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
-        "http://localhost:8000/api/add-student",
+        "http://localhost:8000/api/students",
         mockStudent
       );
       expect(result).toEqual(mockResponse);

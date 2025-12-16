@@ -60,7 +60,10 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        //
+        return response()->json([
+            'status' => 200,
+            'student' => $student
+        ]);
     }
 
     /**
@@ -69,13 +72,7 @@ class StudentController extends Controller
      * @param  \App\Models\Student  $student
      * @return \Illuminate\Http\Response
      */
-    public function edit(Student $student, $id)
-    {
-        return response()->json([
-            'status'=>200,
-            'student'=> $student->find($id)
-        ]);
-    }
+    // The `edit` action is not used in API resource controllers; use `show` instead.
 
     /**
      * Update the specified resource in storage.
@@ -84,17 +81,21 @@ class StudentController extends Controller
      * @param  \App\Models\Student  $student
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Student $student, $id)
+    public function update(Request $request, Student $student)
     {
-        $studentToUpdate = $student->find($id);
-        $studentToUpdate->name = $request->input('name');
-        $studentToUpdate->course = $request->input('course');
-        $studentToUpdate->email = $request->input('email');
-        $studentToUpdate->phone = $request->input('phone');
-        $studentToUpdate->save();
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'course' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:50',
+        ]);
+
+        $student->update($data);
+
         return response()->json([
-            'status'=>200,
-            'message'=>'Student updated successfully'
+            'status' => 200,
+            'message' => 'Student updated successfully',
+            'student' => $student
         ]);
     }
 
@@ -104,13 +105,13 @@ class StudentController extends Controller
      * @param  \App\Models\Student  $student
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Student $student, $id)
+    public function destroy(Student $student)
     {
-        $studentToDelete = $student->find($id);
-        $studentToDelete->delete();
+        $student->delete();
+
         return response()->json([
-            'status'=>200,
-            'message'=>'Student deleted successfully'
+            'status' => 200,
+            'message' => 'Student deleted successfully'
         ]);
     }
 }

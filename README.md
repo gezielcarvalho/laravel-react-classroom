@@ -100,13 +100,13 @@ laravel-react-classroom/
 
 ## 📊 API Endpoints (Student)
 
-| Method | Endpoint                   | Description        |
-| ------ | -------------------------- | ------------------ |
-| GET    | `/api/students`            | Get all students   |
-| POST   | `/api/add-student`         | Create new student |
-| GET    | `/api/edit-student/{id}`   | Get student by ID  |
-| PUT    | `/api/update-student/{id}` | Update student     |
-| DELETE | `/api/delete-student/{id}` | Delete student     |
+| Method | Endpoint             | Description        |
+| ------ | -------------------- | ------------------ |
+| GET    | `/api/students`      | Get all students   |
+| POST   | `/api/students`      | Create new student |
+| GET    | `/api/students/{id}` | Get student by ID  |
+| PUT    | `/api/students/{id}` | Update student     |
+| DELETE | `/api/students/{id}` | Delete student     |
 
 ## 🔧 Development
 
