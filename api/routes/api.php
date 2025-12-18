@@ -25,5 +25,8 @@ Route::middleware('web')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
+Route::post('/password/forgot', [\App\Http\Controllers\Api\PasswordResetController::class, 'sendResetLink']);
+Route::post('/password/reset', [\App\Http\Controllers\Api\PasswordResetController::class, 'reset']);
+
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum');

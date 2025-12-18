@@ -26,6 +26,19 @@ export default class AuthService {
     await this.getCsrf();
     return apiClient.post("/api/register", payload);
   }
+  static async forgotPassword(email: string): Promise<any> {
+    await this.getCsrf();
+    return apiClient.post("/api/password/forgot", { email });
+  }
+
+  static async resetPassword(payload: {
+    email: string;
+    token: string;
+    password: string;
+    password_confirmation: string;
+  }): Promise<any> {
+    return apiClient.post("/api/password/reset", payload);
+  }
 
   static async logout(): Promise<any> {
     return apiClient.post("/api/logout");

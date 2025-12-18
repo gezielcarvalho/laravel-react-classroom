@@ -49,8 +49,11 @@ const Login: React.FC = () => {
                 <button className="btn btn-primary me-2" type="submit">
                   Login
                 </button>
-                <Link className="btn btn-link" to="/signup">
+                <Link className="btn btn-link me-2" to="/signup">
                   Sign up
+                </Link>
+                <Link className="btn btn-link" to="/forgot-password">
+                  Forgot password?
                 </Link>
               </form>
             </div>

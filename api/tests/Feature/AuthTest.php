@@ -99,6 +99,7 @@ class AuthTest extends TestCase
 
     public function test_logout_clears_session()
     {
+        /** @var \App\Models\User $user */
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum');

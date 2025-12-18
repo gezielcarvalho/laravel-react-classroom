@@ -30,6 +30,15 @@ services:
     networks:
       - app
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    restart: always
+    ports:
+      - 8025:8025
+    networks:
+      - app
+
 networks:
   app:
     driver: bridge

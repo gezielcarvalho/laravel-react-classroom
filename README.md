@@ -76,6 +76,7 @@ npm start
 - **Frontend**: http://localhost:3000
 - **API**: http://localhost:8000
 - **phpMyAdmin**: http://localhost:8088 (user: `root`, pass: see .env)
+- **MailHog (dev SMTP UI)**: http://localhost:8025 (ensure `MAIL_FROM_ADDRESS` is set in `api/.env` so emails have a valid sender)
 
 ## 📚 API Documentation (Swagger)
 
@@ -107,6 +108,7 @@ laravel-react-classroom/
 - **api**: PHP 8.0 + Apache + Laravel
 - **db**: MySQL 5.7
 - **phpmyadmin**: DB admin interface
+- **mailhog**: Dev SMTP capture and web UI (http://localhost:8025)
 
 ## 📊 API Endpoints (Student)
 
