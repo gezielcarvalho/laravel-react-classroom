@@ -10,6 +10,8 @@ RUN pecl install imagick
 
 RUN docker-php-ext-enable imagick 
 
+RUN pecl install pcov && docker-php-ext-enable pcov
+
 RUN docker-php-ext-install mysqli pdo pdo_mysql zip pcntl bcmath 
 
 # JPEG - https://stackoverflow.com/a/52892313/2190689

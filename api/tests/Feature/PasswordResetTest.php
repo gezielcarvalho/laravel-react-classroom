@@ -49,4 +49,18 @@ class PasswordResetTest extends TestCase
 
         $resp->assertStatus(200);
     }
+
+    public function test_cannot_reset_password_with_invalid_token()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->postJson('/api/password/reset', [
+            'email' => $user->email,
+            'token' => 'invalid-token',
+            'password' => 'newpassword',
+            'password_confirmation' => 'newpassword',
+        ]);
+
+        $response->assertStatus(400);
+    }
 }

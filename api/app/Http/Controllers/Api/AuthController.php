@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
@@ -85,6 +86,16 @@ class AuthController extends Controller
         if ($request->hasSession()) {
             $request->session()->invalidate();
             $request->session()->regenerateToken();
+        }
+
+        // If token-based auth was used but currentAccessToken isn't available for deletion,
+        // try to find and delete the token using Sanctum's findToken helper (handles plain tokens).
+        $plainBearer = $request->bearerToken();
+        if ($plainBearer) {
+            $tokenModel = PersonalAccessToken::findToken($plainBearer);
+            if ($tokenModel) {
+                $tokenModel->delete();
+            }
         }
 
         return response()->json(['status' => 200, 'message' => 'Logged out']);
