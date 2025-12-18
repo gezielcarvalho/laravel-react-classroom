@@ -28,8 +28,12 @@ const Login: React.FC = () => {
               {error && <div className="alert alert-danger">{error}</div>}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label">Email</label>
+                  <label htmlFor="email" className="form-label">
+                    Email
+                  </label>
                   <input
+                    id="email"
+                    type="email"
                     className="form-control"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -37,8 +41,11 @@ const Login: React.FC = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Password</label>
+                  <label htmlFor="password" className="form-label">
+                    Password
+                  </label>
                   <input
+                    id="password"
                     type="password"
                     className="form-control"
                     value={password}

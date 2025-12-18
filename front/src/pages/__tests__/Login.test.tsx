@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Login from "../Login";
 import { MemoryRouter } from "react-router-dom";
@@ -9,22 +8,23 @@ afterEach(() => {
 });
 
 test("renders email, password and buttons/links", () => {
-  jest
-    .spyOn(AuthContext, "useAuth")
-    .mockReturnValue({ login: jest.fn() } as any);
+  const loginMock = jest.fn();
+  jest.spyOn(AuthContext, "useAuth").mockReturnValue({
+    user: null,
+    loading: false,
+    login: loginMock,
+    logout: jest.fn(),
+    register: jest.fn(),
+  } as ReturnType<typeof AuthContext.useAuth>);
 
-  const { container } = render(
+  render(
     <MemoryRouter>
       <Login />
     </MemoryRouter>
   );
 
-  const inputs = container.querySelectorAll("input");
-  expect(inputs.length).toBeGreaterThanOrEqual(2);
-  const emailInput = inputs[0] as HTMLInputElement;
-  const passwordInput = container.querySelector(
-    'input[type="password"]'
-  ) as HTMLInputElement;
+  const emailInput = screen.getByRole("textbox", { name: /email/i });
+  const passwordInput = screen.getByLabelText(/password/i);
 
   expect(emailInput).toBeInTheDocument();
   expect(passwordInput).toBeInTheDocument();
@@ -35,21 +35,22 @@ test("renders email, password and buttons/links", () => {
 
 test("successful submit calls login and does not show error", async () => {
   const loginMock = jest.fn().mockResolvedValue({});
-  jest
-    .spyOn(AuthContext, "useAuth")
-    .mockReturnValue({ login: loginMock } as any);
+  jest.spyOn(AuthContext, "useAuth").mockReturnValue({
+    user: null,
+    loading: false,
+    login: loginMock,
+    logout: jest.fn(),
+    register: jest.fn(),
+  } as ReturnType<typeof AuthContext.useAuth>);
 
-  const { container } = render(
+  render(
     <MemoryRouter>
       <Login />
     </MemoryRouter>
   );
 
-  const inputs = container.querySelectorAll("input");
-  const emailInput = inputs[0] as HTMLInputElement;
-  const passwordInput = container.querySelector(
-    'input[type="password"]'
-  ) as HTMLInputElement;
+  const emailInput = screen.getByRole("textbox", { name: /email/i });
+  const passwordInput = screen.getByLabelText(/password/i);
 
   fireEvent.change(emailInput, { target: { value: "a@b.com" } });
   fireEvent.change(passwordInput, { target: { value: "secret" } });
@@ -66,21 +67,22 @@ test("shows error message when login fails", async () => {
   const loginMock = jest.fn().mockRejectedValue({
     response: { data: { message: "Invalid credentials" } },
   });
-  jest
-    .spyOn(AuthContext, "useAuth")
-    .mockReturnValue({ login: loginMock } as any);
+  jest.spyOn(AuthContext, "useAuth").mockReturnValue({
+    user: null,
+    loading: false,
+    login: loginMock,
+    logout: jest.fn(),
+    register: jest.fn(),
+  } as ReturnType<typeof AuthContext.useAuth>);
 
-  const { container } = render(
+  render(
     <MemoryRouter>
       <Login />
     </MemoryRouter>
   );
 
-  const inputs = container.querySelectorAll("input");
-  const emailInput = inputs[0] as HTMLInputElement;
-  const passwordInput = container.querySelector(
-    'input[type="password"]'
-  ) as HTMLInputElement;
+  const emailInput = screen.getByRole("textbox", { name: /email/i });
+  const passwordInput = screen.getByLabelText(/password/i);
 
   fireEvent.change(emailInput, { target: { value: "a@b.com" } });
   fireEvent.change(passwordInput, { target: { value: "wrong" } });

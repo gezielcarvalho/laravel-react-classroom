@@ -72,8 +72,9 @@ class AddStudent extends Component<{}, StudentFormState> {
               <div className="card-body">
                 <form onSubmit={this.saveStudent}>
                   <div className="form-group mb-3">
-                    <label>Name</label>
+                    <label htmlFor="name">Name</label>
                     <input
+                      id="name"
                       type="text"
                       name="name"
                       value={this.state.name}
@@ -83,8 +84,9 @@ class AddStudent extends Component<{}, StudentFormState> {
                     />
                   </div>
                   <div className="form-group mb-3">
-                    <label>Course</label>
+                    <label htmlFor="course">Course</label>
                     <input
+                      id="course"
                       type="text"
                       name="course"
                       value={this.state.course}
@@ -94,8 +96,9 @@ class AddStudent extends Component<{}, StudentFormState> {
                     />
                   </div>
                   <div className="form-group mb-3">
-                    <label>Email</label>
+                    <label htmlFor="email">Email</label>
                     <input
+                      id="email"
                       type="email"
                       name="email"
                       value={this.state.email}
@@ -105,8 +108,9 @@ class AddStudent extends Component<{}, StudentFormState> {
                     />
                   </div>
                   <div className="form-group mb-3">
-                    <label>Phone</label>
+                    <label htmlFor="phone">Phone</label>
                     <input
+                      id="phone"
                       type="tel"
                       name="phone"
                       value={this.state.phone}

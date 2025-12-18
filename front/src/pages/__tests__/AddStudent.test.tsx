@@ -16,29 +16,27 @@ afterEach(() => {
 });
 
 test("renders the form fields and save button", () => {
-  const { container } = render(
+  render(
     <MemoryRouter>
       <AddStudent />
     </MemoryRouter>
   );
 
-  expect(container.querySelector('input[name="name"]')).toBeInTheDocument();
-  expect(container.querySelector('input[name="course"]')).toBeInTheDocument();
-  expect(container.querySelector('input[name="email"]')).toBeInTheDocument();
-  expect(container.querySelector('input[name="phone"]')).toBeInTheDocument();
+  expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+  expect(screen.getByLabelText(/course/i)).toBeInTheDocument();
+  expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+  expect(screen.getByLabelText(/phone/i)).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
 });
 
 test("updates input values on change", () => {
-  const { container } = render(
+  render(
     <MemoryRouter>
       <AddStudent />
     </MemoryRouter>
   );
 
-  const nameInput = container.querySelector(
-    'input[name="name"]'
-  ) as HTMLInputElement;
+  const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
   fireEvent.change(nameInput, { target: { value: "Alice" } });
   expect(nameInput.value).toBe("Alice");
 });
@@ -49,36 +47,24 @@ test("successful save calls StudentService.createStudent, shows swal and resets 
     data: { message: "Student created" },
   });
 
-  const { container } = render(
+  render(
     <MemoryRouter>
       <AddStudent />
     </MemoryRouter>
   );
 
-  fireEvent.change(
-    container.querySelector('input[name="name"]') as HTMLInputElement,
-    {
-      target: { value: "Alice" },
-    }
-  );
-  fireEvent.change(
-    container.querySelector('input[name="course"]') as HTMLInputElement,
-    {
-      target: { value: "Math" },
-    }
-  );
-  fireEvent.change(
-    container.querySelector('input[name="email"]') as HTMLInputElement,
-    {
-      target: { value: "a@b.com" },
-    }
-  );
-  fireEvent.change(
-    container.querySelector('input[name="phone"]') as HTMLInputElement,
-    {
-      target: { value: "12345" },
-    }
-  );
+  fireEvent.change(screen.getByLabelText(/name/i) as HTMLInputElement, {
+    target: { value: "Alice" },
+  });
+  fireEvent.change(screen.getByLabelText(/course/i) as HTMLInputElement, {
+    target: { value: "Math" },
+  });
+  fireEvent.change(screen.getByLabelText(/email/i) as HTMLInputElement, {
+    target: { value: "a@b.com" },
+  });
+  fireEvent.change(screen.getByLabelText(/phone/i) as HTMLInputElement, {
+    target: { value: "12345" },
+  });
 
   const saveBtn = screen.getByRole("button", { name: /save/i });
   expect(saveBtn).toHaveTextContent("Save");
@@ -96,35 +82,24 @@ test("successful save calls StudentService.createStudent, shows swal and resets 
 
   // After successful save, button text should be back to Save and inputs cleared
   expect(saveBtn).toHaveTextContent("Save");
-  expect(
-    (container.querySelector('input[name="name"]') as HTMLInputElement).value
-  ).toBe("");
-  expect(
-    (container.querySelector('input[name="course"]') as HTMLInputElement).value
-  ).toBe("");
-  expect(
-    (container.querySelector('input[name="email"]') as HTMLInputElement).value
-  ).toBe("");
-  expect(
-    (container.querySelector('input[name="phone"]') as HTMLInputElement).value
-  ).toBe("");
+  expect((screen.getByLabelText(/name/i) as HTMLInputElement).value).toBe("");
+  expect((screen.getByLabelText(/course/i) as HTMLInputElement).value).toBe("");
+  expect((screen.getByLabelText(/email/i) as HTMLInputElement).value).toBe("");
+  expect((screen.getByLabelText(/phone/i) as HTMLInputElement).value).toBe("");
 });
 
 test("does not show success when response status is not 2xx and leaves button as Saving...", async () => {
   mockedService.createStudent.mockResolvedValue({ status: 400, data: {} });
 
-  const { container } = render(
+  render(
     <MemoryRouter>
       <AddStudent />
     </MemoryRouter>
   );
 
-  fireEvent.change(
-    container.querySelector('input[name="name"]') as HTMLInputElement,
-    {
-      target: { value: "Carol" },
-    }
-  );
+  fireEvent.change(screen.getByLabelText(/name/i) as HTMLInputElement, {
+    target: { value: "Carol" },
+  });
 
   const saveBtn = screen.getByRole("button", { name: /save/i });
   fireEvent.click(saveBtn);
@@ -196,18 +171,15 @@ test("synchronous error thrown resets button text", async () => {
   });
   const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-  const { container } = render(
+  render(
     <MemoryRouter>
       <AddStudent />
     </MemoryRouter>
   );
 
-  fireEvent.change(
-    container.querySelector('input[name="name"]') as HTMLInputElement,
-    {
-      target: { value: "Sync" },
-    }
-  );
+  fireEvent.change(screen.getByLabelText(/name/i) as HTMLInputElement, {
+    target: { value: "Sync" },
+  });
 
   const saveBtn = screen.getByRole("button", { name: /save/i });
 
