@@ -42,6 +42,11 @@
       "last 1 safari version"
     ]
   },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/src/types/"
+    ]
+  },
   "devDependencies": {
     "@types/axios": "^0.9.36",
     "@types/jest": "^29.5.3",

@@ -44,8 +44,11 @@ const ResetPassword: React.FC = () => {
               {error && <div className="alert alert-danger">{error}</div>}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label">Email</label>
+                  <label htmlFor="reset-email" className="form-label">
+                    Email
+                  </label>
                   <input
+                    id="reset-email"
                     type="email"
                     className="form-control"
                     value={email}
@@ -54,8 +57,11 @@ const ResetPassword: React.FC = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">New Password</label>
+                  <label htmlFor="reset-password" className="form-label">
+                    New Password
+                  </label>
                   <input
+                    id="reset-password"
                     type="password"
                     className="form-control"
                     value={password}
@@ -64,8 +70,14 @@ const ResetPassword: React.FC = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Confirm Password</label>
+                  <label
+                    htmlFor="reset-password-confirm"
+                    className="form-label"
+                  >
+                    Confirm Password
+                  </label>
                   <input
+                    id="reset-password-confirm"
                     type="password"
                     className="form-control"
                     value={passwordConfirmation}

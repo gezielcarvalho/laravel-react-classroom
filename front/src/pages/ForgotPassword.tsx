@@ -29,8 +29,11 @@ const ForgotPassword: React.FC = () => {
               {error && <div className="alert alert-danger">{error}</div>}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label">Email</label>
+                  <label htmlFor="forgot-email" className="form-label">
+                    Email
+                  </label>
                   <input
+                    id="forgot-email"
                     type="email"
                     className="form-control"
                     value={email}

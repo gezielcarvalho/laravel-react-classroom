@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Toolbar from "../Toolbar";
 import { MemoryRouter } from "react-router-dom";
@@ -26,20 +25,18 @@ describe("Toolbar", () => {
     // Simulate logged-in user by spying on useAuth
     const AuthCtx = require("../../contexts/AuthContext");
     const logoutMock = jest.fn().mockResolvedValue(undefined);
-    jest
-      .spyOn(AuthCtx, "useAuth")
-      .mockReturnValue({
-        user: { name: "Test" },
-        loading: false,
-        logout: logoutMock,
-      });
+    jest.spyOn(AuthCtx, "useAuth").mockReturnValue({
+      user: { name: "Test" },
+      loading: false,
+      logout: logoutMock,
+    });
 
-    const { getByRole } = render(
+    render(
       <MemoryRouter>
         <Toolbar />
       </MemoryRouter>
     );
-    const btn = getByRole("button", { name: /logout/i });
+    const btn = screen.getByRole("button", { name: /logout/i });
     fireEvent.click(btn);
 
     expect(logoutMock).toHaveBeenCalled();
