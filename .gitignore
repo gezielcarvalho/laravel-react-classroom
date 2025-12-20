@@ -1,0 +1,18 @@
+# Node
+node_modules/
+
+# Laravel / PHP
+/vendor/
+.env
+.env.*.local
+.phpunit.result.cache
+
+# OS
+.DS_Store
+
+# Docker archive
+.docker/
+
+# Build
+dist/
+build/

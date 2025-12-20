@@ -103,6 +103,11 @@ laravel-react-classroom/
 └── docker-compose.yaml
 ```
 
+Additional docker folders:
+
+- `docker/` — shared Dockerfiles, nginx configs and helper images (preferred location for reusable images)
+- `.docker/` — legacy local data archive (large runtime DB files). See note below.
+
 ## 🐳 Docker Services
 
 - **api**: PHP 8.0 + Apache + Laravel
