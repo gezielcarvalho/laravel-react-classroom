@@ -15,8 +15,9 @@ docker pull "$FRONT_IMAGE"
 
 echo "Updating docker-compose.prod.yml to use ${IMAGE_TAG}"
 # Use env substitution via docker/.env.production or export env vars
-export API_IMAGE_OVERRIDE="$API_IMAGE"
-export FRONT_IMAGE_OVERRIDE="$FRONT_IMAGE"
+echo "Exporting environment variables for docker-compose"
+export API_IMAGE="$API_IMAGE"
+export FRONT_IMAGE="$FRONT_IMAGE"
 
 docker compose -f docker-compose.prod.yml --env-file docker/.env.production pull
 docker compose -f docker-compose.prod.yml --env-file docker/.env.production up -d

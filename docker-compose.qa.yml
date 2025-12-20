@@ -67,8 +67,8 @@ services:
 
   front:
     build:
-      context: ./front
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: front/Dockerfile
     image: laravel-classroom-front:qa
     ports:
       - "3000:80"

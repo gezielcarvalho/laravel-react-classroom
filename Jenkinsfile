@@ -19,9 +19,17 @@ pipeline {
       }
     }
 
+    stage('Build php_base') {
+      steps {
+        // Build the shared PHP base image first so api build can reference it
+        sh "docker build -t ${REGISTRY}/laravel-php-base:${params.IMAGE_TAG} ./docker/php"
+      }
+    }
+
     stage('Build API') {
       steps {
-        sh "docker build -t ${API_IMAGE}:${params.IMAGE_TAG} ./api"
+        // Pass the built base image as build-arg so api build uses the prebuilt base
+        sh "docker build --build-arg BASE_IMAGE=${REGISTRY}/laravel-php-base:${params.IMAGE_TAG} -t ${API_IMAGE}:${params.IMAGE_TAG} ./api"
       }
     }
 
@@ -36,6 +44,7 @@ pipeline {
         // credentialsId 'docker-registry-creds' must be created in Jenkins
         withCredentials([usernamePassword(credentialsId: 'docker-registry-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
           sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin ${REGISTRY}'
+          sh "docker push ${REGISTRY}/laravel-php-base:${params.IMAGE_TAG}"
           sh "docker push ${API_IMAGE}:${params.IMAGE_TAG}"
           sh "docker push ${FRONT_IMAGE}:${params.IMAGE_TAG}"
         }
