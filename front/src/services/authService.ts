@@ -26,14 +26,20 @@ export default class AuthService {
     email: string;
     password: string;
     password_confirmation: string;
+    captcha_token?: string;
+    captcha_answer?: string | number;
   }): Promise<any> {
     // Ensure CSRF cookie is set before attempting register
     await this.getCsrf();
     return apiClient.post("/api/register", payload);
   }
-  static async forgotPassword(email: string): Promise<any> {
+  static async forgotPassword(payload: {
+    email: string;
+    captcha_token?: string;
+    captcha_answer?: string | number;
+  }): Promise<any> {
     await this.getCsrf();
-    return apiClient.post("/api/password/forgot", { email });
+    return apiClient.post("/api/password/forgot", payload);
   }
 
   static async resetPassword(payload: {
@@ -41,7 +47,10 @@ export default class AuthService {
     token: string;
     password: string;
     password_confirmation: string;
+    captcha_token?: string;
+    captcha_answer?: string | number;
   }): Promise<any> {
+    await this.getCsrf();
     return apiClient.post("/api/password/reset", payload);
   }
 

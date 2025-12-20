@@ -92,13 +92,41 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+            'captcha_token' => 'nullable|string',
+            'captcha_answer' => 'nullable|numeric',
         ]);
+
+        $captchaEnabled = env('CAPTCHA_ENABLED', false);
+
+        $ip = $request->ip();
+        $attemptsKey = "register:attempts:{$ip}";
+        $attempts = (int) Cache::get($attemptsKey, 0);
+        $maxAttempts = 6;
+        if ($attempts >= $maxAttempts) {
+            return response()->json(['message' => 'Too many attempts. Try again later.'], 429);
+        }
+
+        if ($captchaEnabled) {
+            if (empty($data['captcha_token']) || !isset($data['captcha_answer'])) {
+                Cache::put($attemptsKey, $attempts + 1, now()->addMinutes(15));
+                return response()->json(['message' => 'Captcha required'], 422);
+            }
+            $entry = Cache::get("captcha:{$data['captcha_token']}");
+            if (!$entry || (int)$entry['answer'] !== (int)$data['captcha_answer']) {
+                Cache::put($attemptsKey, $attempts + 1, now()->addMinutes(15));
+                return response()->json(['message' => 'Invalid captcha'], 422);
+            }
+            Cache::forget("captcha:{$data['captcha_token']}");
+        }
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+
+        // Successful register: reset attempts
+        Cache::forget($attemptsKey);
 
         return response()->json([
             'status' => 201,

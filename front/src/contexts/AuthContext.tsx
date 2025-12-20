@@ -17,7 +17,8 @@ interface AuthContextValue {
     name: string,
     email: string,
     password: string,
-    password_confirmation: string
+    password_confirmation: string,
+    captcha?: { token?: string; answer?: string | number }
   ) => Promise<void>;
 }
 
@@ -63,17 +64,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     name: string,
     email: string,
     password: string,
-    password_confirmation: string
+    password_confirmation: string,
+    captcha?: { token?: string; answer?: string | number }
   ) => {
-    // Call register endpoint then attempt to login to create session
-    const res = await AuthService.register({
-      name,
-      email,
-      password,
-      password_confirmation,
-    });
+    const payload: any = { name, email, password, password_confirmation };
+    if (captcha?.token) payload.captcha_token = captcha.token;
+    if (captcha?.answer !== undefined) payload.captcha_answer = captcha.answer;
+    const res = await AuthService.register(payload);
     if (res.status >= 200 && res.status < 300) {
-      // After successful registration, log the user in
       await login(email, password);
     }
   };

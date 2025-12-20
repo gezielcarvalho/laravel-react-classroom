@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import CaptchaService from "../services/captchaService";
 
 const Signup: React.FC = () => {
   const [name, setName] = useState("");
@@ -7,13 +8,34 @@ const Signup: React.FC = () => {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInput, setCaptchaInput] = useState("");
   const { register } = useAuth();
+
+  const fetchCaptcha = async () => {
+    try {
+      const res = await CaptchaService.getCaptcha();
+      setCaptchaQuestion(res.data.question);
+      setCaptchaToken(res.data.token);
+      setCaptchaInput("");
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     try {
-      await register(name, email, password, passwordConfirmation);
+      await register(name, email, password, passwordConfirmation, {
+        token: captchaToken || undefined,
+        answer: captchaInput,
+      });
     } catch (err: any) {
       setError(err?.response?.data?.message || "Registration failed");
     }
@@ -74,6 +96,28 @@ const Signup: React.FC = () => {
                 <button className="btn btn-primary" type="submit">
                   Sign up
                 </button>
+                <div className="mt-3">
+                  <label className="form-label">CAPTCHA</label>
+                  <div className="d-flex align-items-center">
+                    <div className="form-control w-auto me-2">
+                      {captchaQuestion} =
+                    </div>
+                    <input
+                      className="form-control w-50"
+                      value={captchaInput}
+                      onChange={(e) => setCaptchaInput(e.target.value)}
+                      placeholder="Answer"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-secondary ms-2"
+                      onClick={fetchCaptcha}
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                </div>
               </form>
             </div>
           </div>

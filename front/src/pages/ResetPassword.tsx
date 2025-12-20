@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import AuthService from "../services/authService";
+import CaptchaService from "../services/captchaService";
 
 const ResetPassword: React.FC = () => {
   const [search] = useSearchParams();
@@ -12,6 +13,22 @@ const ResetPassword: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInput, setCaptchaInput] = useState("");
+
+  const fetchCaptcha = async () => {
+    try {
+      const res = await CaptchaService.getCaptcha();
+      setCaptchaQuestion(res.data.question);
+      setCaptchaToken(res.data.token);
+      setCaptchaInput("");
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +40,8 @@ const ResetPassword: React.FC = () => {
         token,
         password,
         password_confirmation: passwordConfirmation,
+        captcha_token: captchaToken || undefined,
+        captcha_answer: captchaInput,
       });
       if (res.status === 200) {
         setMessage("Password reset successful. You may now login.");
@@ -84,6 +103,28 @@ const ResetPassword: React.FC = () => {
                     onChange={(e) => setPasswordConfirmation(e.target.value)}
                     required
                   />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">CAPTCHA</label>
+                  <div className="d-flex align-items-center">
+                    <div className="form-control w-auto me-2">
+                      {captchaQuestion} =
+                    </div>
+                    <input
+                      className="form-control w-50"
+                      value={captchaInput}
+                      onChange={(e) => setCaptchaInput(e.target.value)}
+                      placeholder="Answer"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-secondary ms-2"
+                      onClick={fetchCaptcha}
+                    >
+                      Refresh
+                    </button>
+                  </div>
                 </div>
                 <button className="btn btn-primary" type="submit">
                   Reset password
