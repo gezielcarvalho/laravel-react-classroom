@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Route;
 // Use RESTful resource routes for students
 Route::apiResource('students', StudentController::class);
 
+// Health endpoint for orchestration / smoke checks
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok'], 200);
+});
+
 Route::middleware('web')->group(function () {
     // Ensure session middleware is present for cookie-based (Sanctum) auth flows
     Route::post('/login', [AuthController::class, 'login']);

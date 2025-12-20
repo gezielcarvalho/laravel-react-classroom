@@ -1,3 +1,92 @@
+# Deployment Preparation Guide
+
+This guide documents the repository's current deployment-related layout and provides commands to prepare and run QA and production stacks.
+
+Summary of recent changes
+
+- Shared base Dockerfiles moved to `docker/` (`docker/php`, `docker/mysql`).
+- Legacy local runtime data moved to `docker/legacy-archive/.docker` and annotated with `.docker/ARCHIVE_NOTICE.md`.
+- QA compose: `docker-compose.qa.yml` (use for QA/testing locally).
+- Production compose scaffold: `docker-compose.prod.yml` (image-based, no source mounts).
+- `api/Dockerfile` and `front/Dockerfile` are multi-stage and suitable for CI builds.
+- Added `scripts/archive-docker.sh` to move `.docker` out of the repo.
+
+Files to know
+
+- `docker-compose.qa.yml` — QA/dev compose using local builds and mounts.
+- `docker-compose.prod.yml` — production-ready compose that uses images and `.env.production`.
+- `docker/` — reusable base images and nginx configs.
+- `.github/workflows/ci.yml` — CI pipeline to run tests and build/push images.
+- `docs/deploy-runbook.md` — runbook for deployments, migrations, and rollback.
+
+Running QA locally
+
+1. Build and bring up QA stack:
+
+```bash
+docker compose -f docker-compose.qa.yml build
+docker compose -f docker-compose.qa.yml up -d
+```
+
+2. After DB is ready, bootstrap the app:
+
+````bash
+docker compose -f docker-compose.qa.yml exec api php artisan key:generate
+docker compose -f docker-compose.qa.yml exec api php artisan migrate --force
+
+3. Run smoke tests (quick verification):
+
+```bash
+# from repo root
+chmod +x scripts/qa-smoke-test.sh
+./scripts/qa-smoke-test.sh http://localhost:8080
+````
+
+````
+
+Running production compose locally (image-based)
+
+1. Create a `docker/.env.production` from the example and set secrets (do not commit):
+
+```bash
+cp .env.production.example docker/.env.production
+# edit as required
+````
+
+2. Start production-like stack (uses images):
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file docker/.env.production up -d
+```
+
+CI / CD notes
+
+- This repository uses Jenkins for CI/CD. GitHub should be configured to send push webhooks to the Jenkins server (or use the GitHub Branch Source plugin) so the Jenkins job runs automatically on pushes/PR merges.
+- The repository contains a `Jenkinsfile` that defines the pipeline: build images for `api` and `front`, push to your registry (using Jenkins credentials), and deploy via `docker-compose.prod.yml` on the Jenkins host.
+- Remove or ignore GitHub Actions workflows; Jenkins is the canonical CI/CD system for this project.
+
+Jenkins essentials
+
+1. Create Jenkins credentials:
+
+- `docker-registry-creds` (username/password) for container registry login.
+
+2. Ensure the Jenkins agent running the job has Docker and Docker Compose installed and that the Jenkins user has permission to access the Docker socket (typically via `docker` group).
+3. Ensure `docker/.env.production` exists on the Jenkins host with production variables (do NOT commit secrets).
+4. Configure GitHub webhook to POST to your Jenkins job URL (or configure the GitHub App/Branch Source plugin) so pushes trigger the pipeline.
+
+Jenkins pipeline notes
+
+- The `Jenkinsfile` builds and tags images using `IMAGE_TAG` (defaults to build number), logs into the registry using `docker-registry-creds`, pushes images, runs `docker compose pull` and `docker compose up -d` using `docker-compose.prod.yml`, runs migrations, then executes the smoke tests in `scripts/qa-smoke-test.sh`.
+- For security, store credentials inside Jenkins and do not embed them in files.
+
+Housekeeping
+
+- `.docker/` contains large historical data and was archived to `docker/legacy-archive/.docker`. Remove local copies before pushing the repo to remote.
+- The script `scripts/archive-docker.sh` moves `.docker` out of the repo to `~/docker-archives/`.
+
+If you need a provider-specific deploy (Azure App Service, Container Apps, AWS ECS, Kubernetes), I can scaffold provider IaC and CD pipelines next.
+
 # DevOps Preparation & Deployment Guide
 
 **Purpose:** prepare and standardize application packaging and deployment for multiple technologies (dotnet, java, laravel/php, html/static, vue, angular) and databases (MySQL, SQL Server) on the existing Docker-based infrastructure.
