@@ -1,4 +1,4 @@
-FROM php:8.0-apache
+FROM php:8.0-fpm-alpine
 
 RUN apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS tzdata autoconf build-base libzip-dev zip unzip bash curl git && \
@@ -11,14 +11,17 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Install PHP dependencies (composer) without dev requirements in build stage
+# Install PHP dependencies without running Composer scripts (prevents running
+# artisan/package discovery during the image build). We'll run discovery at
+# runtime instead.
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-progress --no-interaction || true
+RUN composer install --no-dev --optimize-autoloader --no-progress --no-interaction --no-scripts
 
 # Copy app source
 COPY . .
 
-RUN composer dump-autoload --optimize && \
+# Generate optimized autoload without running scripts, then set permissions
+RUN composer dump-autoload --optimize --no-scripts && \
     chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html
 
