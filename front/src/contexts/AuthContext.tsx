@@ -7,7 +7,11 @@ type User = any;
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (
+    email: string,
+    password: string,
+    captcha?: { token?: string; answer?: string | number }
+  ) => Promise<void>;
   logout: () => Promise<void>;
   register: (
     name: string,
@@ -40,8 +44,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchUser();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const res = await AuthService.login({ email, password });
+  const login = async (
+    email: string,
+    password: string,
+    captcha?: { token?: string; answer?: string | number }
+  ) => {
+    const payload: any = { email, password };
+    if (captcha?.token) payload.captcha_token = captcha.token;
+    if (captcha?.answer !== undefined) payload.captcha_answer = captcha.answer;
+    const res = await AuthService.login(payload);
     if (res.status >= 200 && res.status < 300) {
       setUser(res.data.user);
       navigate("/");

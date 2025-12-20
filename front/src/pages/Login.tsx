@@ -1,22 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import CaptchaService from "../services/captchaService";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInput, setCaptchaInput] = useState("");
+  const [loadingCaptcha, setLoadingCaptcha] = useState(false);
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     try {
-      await login(email, password);
+      await login(email, password, {
+        token: captchaToken || undefined,
+        answer: captchaInput,
+      });
     } catch (err: any) {
       setError(err?.response?.data?.message || "Login failed");
     }
   };
+  const fetchCaptcha = async () => {
+    try {
+      setLoadingCaptcha(true);
+      const res = await CaptchaService.getCaptcha();
+      setCaptchaQuestion(res.data.question);
+      setCaptchaToken(res.data.token);
+      setCaptchaInput("");
+    } catch (e) {
+      // ignore
+    } finally {
+      setLoadingCaptcha(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
 
   return (
     <div className="container">
@@ -53,7 +78,38 @@ const Login: React.FC = () => {
                     required
                   />
                 </div>
-                <button className="btn btn-primary me-2" type="submit">
+                <div className="mb-3">
+                  <label htmlFor="captcha" className="form-label">
+                    CAPTCHA: please solve
+                  </label>
+                  <div className="d-flex align-items-center">
+                    <div className="form-control w-auto me-2">
+                      {captchaQuestion || (loadingCaptcha ? "loading..." : "-")}{" "}
+                      =
+                    </div>
+                    <input
+                      id="captcha"
+                      type="text"
+                      className="form-control w-50"
+                      value={captchaInput}
+                      onChange={(e) => setCaptchaInput(e.target.value)}
+                      placeholder="Answer"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-secondary ms-2"
+                      onClick={fetchCaptcha}
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+                <button
+                  className="btn btn-primary me-2"
+                  type="submit"
+                  disabled={!captchaInput}
+                >
                   Login
                 </button>
                 <Link className="btn btn-link me-2" to="/signup">

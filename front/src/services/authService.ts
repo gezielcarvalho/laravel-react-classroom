@@ -10,7 +10,12 @@ export default class AuthService {
     return apiClient.get("/sanctum/csrf-cookie");
   }
 
-  static async login(credentials: LoginCredentials): Promise<any> {
+  static async login(
+    credentials: LoginCredentials & {
+      captcha_token?: string;
+      captcha_answer?: string | number;
+    }
+  ): Promise<any> {
     // Ensure CSRF cookie is set before attempting login
     await this.getCsrf();
     return apiClient.post("/api/login", credentials);
